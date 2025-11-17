@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Μετρητής</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #fafafa;
+      --fg: #111;
+      --card-bg: #ffffff;
+      --muted: #666;
+      --btn-bg: #eee;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111;
+        --fg: #eee;
+        --card-bg: #1c1c1c;
+        --muted: #aaa;
+        --btn-bg: #2a2a2a;
+      }
+    }
+
+    body{
+      margin:0;
+      font-family:system-ui;
+      padding:10px;
+      background:var(--bg);
+      color:var(--fg);
+    }
+
+    .grid{display:grid;gap:10px}
+
+    .card{
+      background:var(--card-bg);
+      padding:12px;
+      border-radius:10px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.08);
+      text-align:center;
+    }
+
+    .name{font-size:1.1rem;font-weight:600;color:var(--fg)}
+    .sub{font-size:0.75rem;color:var(--muted);margin-top:-4px;margin-bottom:6px}
+
+    .controls{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:6px}
+
+    button{
+      border:0;
+      padding:10px 14px;
+      border-radius:8px;
+      font-size:1.2rem;
+      cursor:pointer;
+      background:var(--btn-bg);
+      color:var(--fg);
+    }
+    button:active{transform:scale(.97)}
+
+    label{
+      background:var(--btn-bg);
+      color:var(--fg);
+      padding:8px 10px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    .count{font-size:1.4rem;min-width:50px;text-align:center;font-weight:700;color:var(--fg)}
+
+    .footer{
+      margin-top:14px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      justify-content:center;
+    }
+    .footer button, .footer label{
+      font-size:0.85rem;
+      padding:8px 10px;
+      background:var(--btn-bg);
+      color:var(--fg);
+      border-radius:8px;
+      cursor:pointer;
+    }
+  .icon{font-size:2rem;margin-top:4px;margin-bottom:4px;color:var(--fg)}
+  </style>
+</head>
+<body>
+
+  <div class="grid">
+    <div class="card">
+      <div class="name">Μελομακάρονα</div>
+      <div class="sub">Melomakarona</div>
+      <div class="icon">🍯</div>
+      <div class="controls">
+        <button data-action="dec" data-key="melomakarona">−</button>
+        <div class="count" id="melomakarona-count">0</div>
+        <button data-action="inc" data-key="melomakarona">+</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="name">Κουραμπιέδες</div>
+      <div class="sub">Kourabiedes</div>
+      <div class="icon">🍪</div>
+      <div class="controls">
+        <button data-action="dec" data-key="kourabiedes">−</button>
+        <div class="count" id="kourabiedes-count">0</div>
+        <button data-action="inc" data-key="kourabiedes">+</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="name">Δίπλες</div>
+      <div class="sub">Diples</div>
+      <div class="icon">🥞</div>
+      <div class="controls">
+        <button data-action="dec" data-key="diples">−</button>
+        <div class="count" id="diples-count">0</div>
+        <button data-action="inc" data-key="diples">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:10px;text-align:center">
+    <div class="name" id="total-display">Σύνολο: 0</div>
+  </div>
+
+  <div class="footer">
+    <button id="reset">Μηδενισμός</button>
+    <button id="export-btn">Export</button>
+    <label>Import
+      <input id="import-file" type="file" accept="application/json" style="display:none" />
+    </label>
+  </div>
+
+<script>
+(function(){
+  const KEYS=['melomakarona','kourabiedes','diples'];
+  const STORAGE_KEY='glyka_counts_v1';
+  const elems={};
+  KEYS.forEach(k=>elems[k]=document.getElementById(k+'-count'));
+  const totalDisplay=document.getElementById('total-display');
+
+  function readStorage(){
+    try{
+      const raw=localStorage.getItem(STORAGE_KEY);
+      if(!raw) return {counts:{melomakarona:0,kourabiedes:0,diples:0}};
+      return JSON.parse(raw);
+    }catch(_){return {counts:{melomakarona:0,kourabiedes:0,diples:0}}}
+  }
+
+  function writeStorage(state){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+
+  function render(){
+    const s=readStorage();
+    KEYS.forEach(k=>elems[k].textContent=s.counts[k]||0);
+    const total=KEYS.reduce((a,k)=>a+(s.counts[k]||0),0);
+    totalDisplay.textContent='Σύνολο: '+total;
+  }
+
+  function change(key,d){
+    const s=readStorage();
+    s.counts[key]=Math.max(0,(s.counts[key]||0)+d);
+    writeStorage(s);
+    render();
+  }
+
+  if(!localStorage.getItem(STORAGE_KEY)) writeStorage({counts:{melomakarona:0,kourabiedes:0,diples:0}});
+  render();
+
+  document.querySelectorAll('button[data-action]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      change(b.dataset.key,b.dataset.action==='inc'?1:-1);
+    });
+  });
+
+  document.getElementById('reset').onclick=()=>{
+    writeStorage({counts:{melomakarona:0,kourabiedes:0,diples:0}});
+    render();
+  };
+
+  document.getElementById('export-btn').onclick=()=>{
+    const blob=new Blob([JSON.stringify(readStorage(),null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='counts.json'; a.click(); URL.revokeObjectURL(url);
+  };
+
+  document.getElementById('import-file').onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(data && data.counts){writeStorage(data);render();}
+      }catch(_){alert('Invalid');}
+    };
+    r.readAsText(f);
+  };
+})();
+</script>
+
+</body>
+</html>
