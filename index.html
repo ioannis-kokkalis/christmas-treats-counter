@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Μετρητής</title>
+  <title>κάπου ώπα — kinda whoa</title>
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
     :root {
       color-scheme: light dark;
       --bg: #fafafa;
@@ -12,6 +14,8 @@
       --card-bg: #ffffff;
       --muted: #666;
       --btn-bg: #eee;
+      --gap: 1rem;
+      --max-width: 400px;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -24,124 +28,127 @@
       }
     }
 
-    body{
-      margin:0;
-      font-family:system-ui;
-      padding:10px;
-      background:var(--bg);
-      color:var(--fg);
-    }
+    body{ margin:0; font-family:system-ui; padding:var(--gap); background:var(--bg); color:var(--fg); display:flex; justify-content:center; min-height:100vh; }
 
-    .grid{display:grid;gap:10px}
+    .main-container { display:flex; flex-direction:column; gap: var(--gap); flex:1; width:100%; max-width: var(--max-width); }
 
-    .card{
-      background:var(--card-bg);
-      padding:12px;
-      border-radius:10px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.08);
-      text-align:center;
-    }
+    .card{ background:var(--card-bg); padding:var(--gap); border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.08); text-align:center; display:flex; flex-direction:column; align-items:center; gap: var(--gap); width:100%; }
 
-    .name{font-size:1.1rem;font-weight:600;color:var(--fg)}
-    .sub{font-size:0.75rem;color:var(--muted);margin-top:-4px;margin-bottom:6px}
+    .title-container { display:flex; flex-direction:column; align-items:center; font-size:2rem; font-weight:bold; gap:0.1em; padding:0 0 .5rem 0; }
+    .title-container span:nth-child(odd){ color:#ff4d4d; }
+    .title-container span:nth-child(even){ color:#4dff88; }
 
-    .controls{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:6px}
+    .top-bar{ display:flex; justify-content:space-between; align-items:center; gap: var(--gap); }
+    .name{font-size:1.1rem;font-weight:600;color:var(--fg); margin-bottom:0;}
 
-    button{
-      border:0;
-      padding:10px 14px;
-      border-radius:8px;
-      font-size:1.2rem;
-      cursor:pointer;
-      background:var(--btn-bg);
-      color:var(--fg);
-    }
+    .counter-row { display:flex; justify-content:space-between; align-items:center; width:100%; }
+    .counter-button { flex:1; font-weight:bold; font-size:1.5rem; }
+    .counter-center { flex:1; display:flex; flex-direction:column; align-items:center; }
+    .counter-image { width:60px; height:60px; border-radius:10px; background:#ccc; margin-bottom:0.25rem; display:flex; justify-content:center; align-items:center; overflow:hidden; }
+    .counter-image img { width:100%; height:100%; object-fit:cover; }
+    .counter-count { font-size:1.4rem; font-weight:700; color:var(--fg); }
+
+    button{ border:0; padding:0.5rem 0.75rem; border-radius:8px; font-size:1.2rem; cursor:pointer; background:var(--btn-bg); color:var(--fg); }
     button:active{transform:scale(.97)}
 
-    label{
-      background:var(--btn-bg);
-      color:var(--fg);
-      padding:8px 10px;
-      border-radius:8px;
-      cursor:pointer;
-    }
+    .footer{ display:flex; flex-wrap:wrap; gap: var(--gap); justify-content:center; }
+    .footer button, .footer label{ font-size:0.85rem; padding:0.5rem 0.75rem; background:var(--btn-bg); color:var(--fg); border-radius:8px; cursor:pointer; margin:0; }
 
-    .count{font-size:1.4rem;min-width:50px;text-align:center;font-weight:700;color:var(--fg)}
+    #ad-container { display:flex; align-items:center; justify-content:center; min-height:120px; width:100%; flex-grow:1; flex-shrink:1; }
+    #ad-container ins.adsbygoogle { width:100% !important; height:100% !important; display:block !important; }
 
-    .footer{
-      margin-top:14px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      justify-content:center;
-    }
-    .footer button, .footer label{
-      font-size:0.85rem;
-      padding:8px 10px;
-      background:var(--btn-bg);
-      color:var(--fg);
-      border-radius:8px;
-      cursor:pointer;
-    }
-  .icon{font-size:2rem;margin-top:4px;margin-bottom:4px;color:var(--fg)}
+    .lang-toggle { padding:0.5rem 0.75rem; border-radius:8px; background:var(--btn-bg); cursor:pointer; font-weight:600; text-align:center; }
+    .storage-note { font-size:0.8rem; color:var(--muted); text-align:center; }
   </style>
 </head>
 <body>
 
-  <div class="grid">
+<div class="main-container">
+  <div class="card title-container">
+    <div style="display:flex; gap:0.1em;">
+      <span>s</span><span>w</span><span>e</span><span>e</span><span>t</span><span>m</span><span>a</span><span>s</span>
+    </div>
+  </div>
+
+  <div class="top-bar">
+    <div class="card total-container" style="align-items:flex-start;">
+      <div class="name" id="total-display">Σύνολο: 0</div>
+    </div>
+    <div class="lang-toggle" id="lang-toggle">EN</div>
+  </div>
+
+  <div id="counters-column" style="display:flex; flex-direction:column; gap: var(--gap);">
     <div class="card">
-      <div class="name">Μελομακάρονα</div>
-      <div class="sub">Melomakarona</div>
-      <div class="icon">🍯</div>
-      <div class="controls">
-        <button data-action="dec" data-key="melomakarona">−</button>
-        <div class="count" id="melomakarona-count">0</div>
-        <button data-action="inc" data-key="melomakarona">+</button>
+      <div class="name" data-gr="Μελομακάρονα" data-en="Melomakarona">Μελομακάρονα</div>
+      <div class="counter-row">
+        <button class="counter-button" data-action="dec" data-key="melomakarona">−</button>
+        <div class="counter-center">
+          <div class="counter-image"><img src="https://elpidaslittlecorner.gr/wp-content/uploads/2019/12/2h-1100x1536.jpg" alt="Melomakarona"></div>
+          <div class="counter-count" id="melomakarona-count">0</div>
+        </div>
+        <button class="counter-button" data-action="inc" data-key="melomakarona">+</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="name">Κουραμπιέδες</div>
-      <div class="sub">Kourabiedes</div>
-      <div class="icon">🍪</div>
-      <div class="controls">
-        <button data-action="dec" data-key="kourabiedes">−</button>
-        <div class="count" id="kourabiedes-count">0</div>
-        <button data-action="inc" data-key="kourabiedes">+</button>
+      <div class="name" data-gr="Κουραμπιέδες" data-en="Kourabiedes">Κουραμπιέδες</div>
+      <div class="counter-row">
+        <button class="counter-button" data-action="dec" data-key="kourabiedes">−</button>
+        <div class="counter-center">
+          <div class="counter-image"><img src="https://www.gastronomos.gr/wp-content/uploads/2021/11/kourabiedes-me-indokarydo-gastronomos1-610x762.jpg" alt="Kourabiedes"></div>
+          <div class="counter-count" id="kourabiedes-count">0</div>
+        </div>
+        <button class="counter-button" data-action="inc" data-key="kourabiedes">+</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="name">Δίπλες</div>
-      <div class="sub">Diples</div>
-      <div class="icon">🥞</div>
-      <div class="controls">
-        <button data-action="dec" data-key="diples">−</button>
-        <div class="count" id="diples-count">0</div>
-        <button data-action="inc" data-key="diples">+</button>
+      <div class="name" data-gr="Δίπλες" data-en="Diples">Δίπλες</div>
+      <div class="counter-row">
+        <button class="counter-button" data-action="dec" data-key="diples">−</button>
+        <div class="counter-center">
+          <div class="counter-image"><img src="https://www.tovima.gr/wp-content/uploads/2025/01/02/MadeInGreece_Diples.jpg" alt="Diples"></div>
+          <div class="counter-count" id="diples-count">0</div>
+        </div>
+        <button class="counter-button" data-action="inc" data-key="diples">+</button>
       </div>
     </div>
   </div>
 
-  <div class="card" style="margin-top:10px;text-align:center">
-    <div class="name" id="total-display">Σύνολο: 0</div>
+  <div class="card" id="ad-container" style="flex-grow:1; display:flex; flex-direction:column; justify-content:center;">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR-AD-CLIENT-ID" crossorigin="anonymous"></script>
+    <ins class="adsbygoogle"
+         data-ad-client="YOUR-AD-CLIENT-ID"
+         data-ad-slot="YOUR-AD-SLOT"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
   </div>
+
+  <div class="storage-note" id="storage-note">Τα δεδομένα αποθηκεύονται μόνο στη συσκευή σας</div>
 
   <div class="footer">
-    <button id="reset">Μηδενισμός</button>
+    <button id="reset">Clear</button>
     <button id="export-btn">Export</button>
     <label>Import
       <input id="import-file" type="file" accept="application/json" style="display:none" />
     </label>
   </div>
+</div>
 
 <script>
 (function(){
   const KEYS=['melomakarona','kourabiedes','diples'];
   const STORAGE_KEY='glyka_counts_v1';
+  let currentLang='gr';
+
   const elems={};
   KEYS.forEach(k=>elems[k]=document.getElementById(k+'-count'));
   const totalDisplay=document.getElementById('total-display');
+  const langToggle=document.getElementById('lang-toggle');
+  const storageNote=document.getElementById('storage-note');
 
   function readStorage(){
     try{
@@ -157,7 +164,7 @@
     const s=readStorage();
     KEYS.forEach(k=>elems[k].textContent=s.counts[k]||0);
     const total=KEYS.reduce((a,k)=>a+(s.counts[k]||0),0);
-    totalDisplay.textContent='Σύνολο: '+total;
+    totalDisplay.textContent=(currentLang==='gr'?'Σύνολο: ':'Total: ')+total;
   }
 
   function change(key,d){
@@ -198,6 +205,19 @@
     };
     r.readAsText(f);
   };
+
+  langToggle.addEventListener('click',()=>{
+    currentLang = currentLang==='gr'?'en':'gr';
+    langToggle.textContent = currentLang==='gr'?'EN':'GR';
+    document.querySelectorAll('#counters-column .name, .total-container .name').forEach(el=>{
+      el.textContent = currentLang==='gr'?el.dataset.gr:el.dataset.en;
+    });
+    storageNote.textContent = currentLang==='gr' ? 'Τα δεδομένα αποθηκεύονται μόνο στη συσκευή σας' : 'Data stored on device only';
+    render();
+    document.getElementById('reset').textContent = currentLang==='gr'?'Μηδενισμός':'Clear';
+    document.getElementById('export-btn').textContent = currentLang==='gr'?'Εξαγωγή':'Export';
+    document.querySelector('label').firstChild.textContent = currentLang==='gr'?'Εισαγωγή':'Import';
+  });
 })();
 </script>
 
